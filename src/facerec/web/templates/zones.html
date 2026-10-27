@@ -1,0 +1,105 @@
+{% extends "layout.html" %}
+{% block title %}Zones et horaires{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Zones et horaires</h1>
+  <p class="muted">Une zone est une porte ou un espace contrôlé. Par défaut, <strong>tout est refusé</strong> : une personne n'entre que si une règle l'y autorise.</p>
+</div>
+
+<section class="grid-2 even">
+  <article class="card">
+    <h2>Zones</h2>
+    {% if zones %}
+    <ul class="list">
+      {% for z in zones %}
+      <li>
+        <div><strong>{{ z.name }}</strong> <span class="muted">· {{ z.rules }} règle{{ 's' if z.rules != 1 }}</span></div>
+        <form method="post" action="/zones/{{ z.id }}/delete">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          <button class="btn btn-small btn-danger" type="submit">Supprimer</button>
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+      <p class="muted">Aucune zone. Créez-en une pour commencer.</p>
+    {% endif %}
+    <form method="post" action="/zones" class="row-form">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <label class="sr-only" for="zone-name">Nom de la zone</label>
+      <input id="zone-name" type="text" name="name" placeholder="Nouvelle zone (ex. Laboratoire)" maxlength="40" required>
+      <button class="btn btn-small btn-primary-inline" type="submit">Ajouter</button>
+    </form>
+  </article>
+
+  <article class="card">
+    <h2>Nouvelle règle d'accès</h2>
+    {% if zones and people %}
+    <form method="post" action="/rules" class="stack">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <label for="rule-person">Personne</label>
+      <select id="rule-person" name="person_id" required>
+        {% for p in people %}<option value="{{ p.id }}">{{ p.name }}</option>{% endfor %}
+      </select>
+      <label for="rule-zone">Zone</label>
+      <select id="rule-zone" name="zone_id" required>
+        {% for z in zones %}<option value="{{ z.id }}">{{ z.name }}</option>{% endfor %}
+      </select>
+
+      <fieldset>
+        <legend>Quand ?</legend>
+        <label class="check"><input type="radio" name="mode" value="schedule" checked> Selon des horaires</label>
+        <label class="check"><input type="radio" name="mode" value="always"> Toujours (24 h / 24, 7 j / 7)</label>
+      </fieldset>
+      <fieldset>
+        <legend>Jours (si « selon des horaires »)</legend>
+        <div class="days">
+          {% for key, label in days %}
+          <label class="day"><input type="checkbox" name="days" value="{{ key }}" {{ 'checked' if key in ('mon','tue','wed','thu','fri') }}><span>{{ label }}</span></label>
+          {% endfor %}
+        </div>
+      </fieldset>
+      <div class="times">
+        <div><label for="rule-start">De</label><input id="rule-start" type="time" name="start" value="08:00"></div>
+        <div><label for="rule-end">À</label><input id="rule-end" type="time" name="end" value="19:00"></div>
+      </div>
+      <p class="muted small">Une plage qui finit avant son début (ex. 22:00 → 06:00) couvre la nuit.</p>
+      <button class="btn btn-primary" type="submit">Ajouter la règle</button>
+    </form>
+    {% else %}
+      <p class="muted">Il faut au moins une zone et une personne pour créer une règle.</p>
+    {% endif %}
+  </article>
+</section>
+
+<section class="card">
+  <h2>Règles en vigueur</h2>
+  {% if rules %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Zone</th><th>Personne</th><th>Quand</th><th></th></tr></thead>
+      <tbody>
+        {% for r in rules %}
+        <tr>
+          <td>{{ r.zone }}</td>
+          <td>{{ r.person }}</td>
+          <td>
+            {% if r.always %}<span class="chip chip-ok">Toujours</span>
+            {% else %}{% for d in r.days %}{{ day_labels[d] }}{{ ', ' if not loop.last }}{% endfor %} · {{ r.start }} → {{ r.end }}{% endif %}
+          </td>
+          <td>
+            <form method="post" action="/rules/{{ r.id }}/delete">
+              <input type="hidden" name="csrf" value="{{ csrf }}">
+              <button class="btn btn-small btn-ghost" type="submit">Retirer</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="muted">Aucune règle : personne n'est autorisé dans les zones définies.</p>
+  {% endif %}
+</section>
+{% endblock %}

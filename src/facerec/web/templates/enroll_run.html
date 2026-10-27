@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block title %}Inscription{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Inscription de {{ enrollment.name }}</h1>
+  <p class="muted" id="enroll-lead">La personne doit se placer face à la caméra de contrôle et bouger légèrement la tête.</p>
+</div>
+
+<section class="live-grid" id="enroll-root" data-id="{{ enrollment.id }}" data-total="{{ enrollment.total }}">
+  <article class="card video-card">
+    <div class="video-frame">
+      {% if live_enabled %}
+        <img id="video" class="video" alt="Flux de la caméra de contrôle" src="/live/stream">
+      {% else %}
+        <div class="video-offline"><strong>Vidéo non activée</strong><span class="muted">L'inscription se déroule quand même devant la caméra de contrôle.</span></div>
+      {% endif %}
+    </div>
+  </article>
+
+  <aside class="live-side">
+    <article class="card center-card" id="progress-card">
+      <div class="progress-ring" role="img" aria-label="Progression de l'inscription">
+        <svg viewBox="0 0 120 120">
+          <circle class="ring-track" cx="60" cy="60" r="52"/>
+          <circle id="ring" class="ring-value" cx="60" cy="60" r="52" transform="rotate(-90 60 60)"/>
+          <path id="ring-check" class="ring-check" d="M38 62l16 16 30-34" hidden/>
+        </svg>
+        <div class="progress-number" id="ring-number"><span id="count">0</span><small>/ {{ enrollment.total }}</small></div>
+      </div>
+      <p id="status-line" class="status-line">En attente du service caméra…</p>
+      <p id="status-detail" class="muted small"></p>
+      <div class="form-actions center">
+        <form method="post" action="/enroll/{{ enrollment.id }}/cancel" id="cancel-form">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          <button class="btn btn-ghost" type="submit">Annuler</button>
+        </form>
+        <a class="btn btn-primary-inline" id="done-link" href="/people" hidden>Voir les personnes</a>
+        <a class="btn btn-primary-inline" id="retry-link" href="/people/new" hidden>Réessayer</a>
+      </div>
+    </article>
+  </aside>
+</section>
+<script src="/static/enroll.js" defer></script>
+{% endblock %}

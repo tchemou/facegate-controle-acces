@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+{% from "macros.html" import ico %}
+{% block title %}Tableau de bord{% endblock %}
+{% block content %}
+{% set total = stats.granted + stats.denied %}
+{% set rate = ((stats.denied / total) * 100) | round(0) | int if total else 0 %}
+<div class="dash-head">
+  <div>
+    <h1>Bonjour, <span class="grad">{{ user }}</span></h1>
+    <p class="muted" id="dash-sub">Vue d'ensemble de l'activité · dernières 24 heures</p>
+  </div>
+  <div class="segmented" role="group" aria-label="Période" id="period">
+    <button type="button" data-period="24h" aria-pressed="true">24 h</button>
+    <button type="button" data-period="7j" aria-pressed="false">7 jours</button>
+    <button type="button" data-period="30j" aria-pressed="false">30 jours</button>
+  </div>
+</div>
+
+<section class="kpis" aria-label="Indicateurs">
+  <article class="kpi">
+    <div class="kpi-top"><span class="kpi-label">Accès autorisés</span><span class="kpi-icon ok">{{ ico('check') }}</span></div>
+    <span class="kpi-value ok" id="kpi-granted" data-count="{{ stats.granted }}">{{ stats.granted }}</span>
+    <div class="kpi-foot"><span class="delta" id="delta-granted">—</span><svg class="spark" id="spark-granted" viewBox="0 0 112 38" aria-hidden="true"></svg></div>
+  </article>
+  <article class="kpi">
+    <div class="kpi-top"><span class="kpi-label">Accès refusés</span><span class="kpi-icon bad">{{ ico('x') }}</span></div>
+    <span class="kpi-value bad" id="kpi-denied" data-count="{{ stats.denied }}">{{ stats.denied }}</span>
+    <div class="kpi-foot"><span class="delta" id="delta-denied">—</span><svg class="spark" id="spark-denied" viewBox="0 0 112 38" aria-hidden="true"></svg></div>
+  </article>
+  <article class="kpi">
+    <div class="kpi-top"><span class="kpi-label">Tentatives suspectes</span><span class="kpi-icon warn">{{ ico('alert') }}</span></div>
+    <span class="kpi-value" id="kpi-alerts" data-count="{{ alerts }}">{{ alerts }}</span>
+    <div class="kpi-foot"><span class="kpi-sub" id="kpi-alerts-sub">Écran détecté ou défi non réussi</span></div>
+  </article>
+  <article class="kpi">
+    <div class="kpi-top"><span class="kpi-label">Personnes actives</span><span class="kpi-icon accent">{{ ico('users') }}</span></div>
+    <span class="kpi-value" id="kpi-people" data-count="{{ people_count }}">{{ people_count }}</span>
+    <div class="kpi-foot"><span class="kpi-sub" id="kpi-rate">{{ rate }} % de refus sur 24 h</span></div>
+  </article>
+</section>
+
+<section class="bento">
+  <article class="card span-8">
+    <div class="card-head">
+      <div><h2>Passages</h2><p id="chart-sub">Accès autorisés et refusés, heure par heure</p></div>
+      <div class="chart-legend"><span><i class="bg-ok"></i>Autorisés</span><span><i class="bg-bad"></i>Refusés</span></div>
+    </div>
+    <div class="chart-box" id="chart-box"></div>
+  </article>
+  <article class="card span-4">
+    <div class="card-head"><div><h2>Motifs de refus</h2><p>Pourquoi un accès a été refusé</p></div></div>
+    <div id="donut-box"></div>
+  </article>
+</section>
+
+<section class="bento">
+  <article class="card span-7">
+    <div class="card-head"><div><h2>Fréquentation</h2><p>Accès par jour et par heure · 28 derniers jours</p></div></div>
+    <div id="heat-box"></div>
+  </article>
+  <article class="card span-5">
+    <div class="card-head"><div><h2>Activité</h2><p>Les derniers passages</p></div><span class="live-dot">En direct</span></div>
+    <ul class="feed" id="feed">
+      {% for e in events[:8] %}
+      <li class="feed-item" data-id="{{ e.id }}">
+        <span class="feed-icon {{ 'ok' if e.decision == 'granted' else 'bad' }}">{{ ico('check' if e.decision == 'granted' else 'x') }}</span>
+        <div class="feed-main">
+          <strong>{{ e.person or "Inconnu" }}</strong>
+          <span>{{ e.zone or "—" }} · {{ (e.reason | reason) if e.reason else "Accès autorisé" }}</span>
+        </div>
+        <span class="feed-time">{{ e.at | dt }}</span>
+      </li>
+      {% endfor %}
+      {% if not events %}<li class="empty-note">Aucun accès enregistré pour l'instant.</li>{% endif %}
+    </ul>
+  </article>
+</section>
+
+{% if rank >= 2 %}
+<section class="bento">
+  <article class="card span-7">
+    <div class="card-head"><div><h2>Posture de sécurité</h2><p>Ce qui protège cette installation, et ce qu'il reste à faire</p></div></div>
+    <div id="posture-box"><p class="empty-note">Analyse en cours…</p></div>
+  </article>
+  <article class="card span-5">
+    <div class="card-head"><div><h2>Caméra de contrôle</h2><p>État du service de reconnaissance</p></div><a class="btn btn-small btn-ghost" href="/live">Ouvrir</a></div>
+    <div id="service-box"><p class="empty-note">Connexion…</p></div>
+  </article>
+</section>
+{% endif %}
+<script src="/static/dashboard.js" defer></script>
+{% endblock %}

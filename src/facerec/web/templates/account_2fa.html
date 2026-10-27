@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block title %}Activer la double authentification{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Activer la double authentification</h1>
+  <p class="muted">Deux étapes : scannez le code avec une application d'authentification (Google Authenticator, Microsoft Authenticator, Aegis, 1Password…), puis entrez le code qu'elle affiche.</p>
+</div>
+
+<section class="card narrow">
+  <ol class="steps-list">
+    <li>
+      <strong>Scannez ce QR code</strong>
+      <div class="qr-box">{{ qr | safe }}</div>
+      <details>
+        <summary>Impossible de scanner ? Saisir la clé à la main</summary>
+        <p><code class="secret">{{ secret }}</code></p>
+        <p class="muted small">Type : basé sur le temps, 6 chiffres, 30 secondes.</p>
+      </details>
+    </li>
+    <li>
+      <strong>Entrez le code affiché</strong>
+      <form method="post" action="/account/2fa/confirm" class="stack" autocomplete="off">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <label class="sr-only" for="code">Code à 6 chiffres</label>
+        <input id="code" type="text" name="code" inputmode="numeric" pattern="[0-9 ]{6,7}" maxlength="7" required autofocus class="code-input" placeholder="123 456" autocomplete="one-time-code">
+        <div class="form-actions">
+          <a class="btn btn-ghost" href="/account">Annuler</a>
+          <button class="btn btn-primary-inline btn-wide" type="submit">Vérifier et activer</button>
+        </div>
+      </form>
+    </li>
+  </ol>
+</section>
+{% endblock %}

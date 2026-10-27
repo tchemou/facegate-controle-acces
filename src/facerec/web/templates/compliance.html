@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+{% block title %}Conformité{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Conformité</h1>
+  <p class="muted">Conservation des données, droit d'accès et état du chiffrement. Les modèles d'analyse d'impact et de registre sont dans le dossier <code>docs/</code>.</p>
+</div>
+
+<section class="grid-2 even">
+  <article class="card">
+    <h2>Durées de conservation</h2>
+    <form method="post" action="/compliance/retention" class="stack">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <label for="events-days">Journal des accès (jours)</label>
+      <input id="events-days" type="number" name="events_days" min="0" max="3650" value="{{ events_days }}" required>
+      <label for="audit-days">Journal d'administration (jours)</label>
+      <input id="audit-days" type="number" name="audit_days" min="0" max="3650" value="{{ audit_days }}" required>
+      <p class="muted small">Entre 7 et 3650 jours, ou 0 pour ne rien supprimer (déconseillé : conserver plus longtemps que nécessaire est un manquement au RGPD). La purge s'exécute automatiquement toutes les 6 heures.</p>
+      <button class="btn btn-primary" type="submit">Enregistrer</button>
+    </form>
+    <form method="post" action="/compliance/purge" class="stack">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <button class="btn btn-ghost" type="submit">Purger maintenant</button>
+    </form>
+  </article>
+
+  <article class="card">
+    <h2>État des données</h2>
+    <dl class="facts">
+      <div><dt>Événements d'accès</dt><dd>{{ overview.events }}</dd></div>
+      <div><dt>Le plus ancien</dt><dd>{{ (overview.oldest_event | dt) if overview.oldest_event else "—" }}</dd></div>
+      <div><dt>Entrées d'administration</dt><dd>{{ overview.audit }}</dd></div>
+      <div><dt>La plus ancienne</dt><dd>{{ (overview.oldest_audit | dt) if overview.oldest_audit else "—" }}</dd></div>
+    </dl>
+    <h2 class="spaced">Chiffrement des empreintes</h2>
+    {% if encryption.plain == 0 %}
+      <p><span class="chip chip-ok">Toutes chiffrées</span> <span class="muted">· {{ encryption.encrypted }} empreinte{{ 's' if encryption.encrypted != 1 }}</span></p>
+    {% else %}
+      <p><span class="chip chip-bad">{{ encryption.plain }} en clair</span> <span class="muted">· {{ encryption.encrypted }} chiffrée{{ 's' if encryption.encrypted != 1 }}</span></p>
+      <p class="muted small">Lancez <code>facerec db encrypt</code> sur la machine du service pour chiffrer les empreintes restantes.</p>
+    {% endif %}
+  </article>
+</section>
+
+<section class="card">
+  <h2>Droit d'accès : exporter les données d'une personne</h2>
+  <p class="muted small">Le fichier JSON contient l'identité, le consentement, les règles d'accès et l'historique de la personne. Les valeurs numériques de ses empreintes n'y figurent pas. Chaque export est tracé dans le journal d'administration.</p>
+  {% if people %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Personne</th><th>Statut</th><th></th></tr></thead>
+      <tbody>
+        {% for p in people %}
+        <tr>
+          <td>{{ p.name }}</td>
+          <td><span class="chip {{ 'chip-ok' if p.active else 'chip-off' }}">{{ 'Active' if p.active else 'Désactivée' }}</span></td>
+          <td><a class="btn btn-small btn-ghost" href="/people/{{ p.id }}/export.json" download>Exporter (JSON)</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}<p class="muted">Aucune personne enregistrée.</p>{% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+{% block title %}En direct{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>En direct</h1>
+  <p class="muted">L'image de la caméra de contrôle, annotée par le système. Elle n'est enregistrée nulle part : seule l'image courante existe, et elle disparaît quand le service s'arrête.</p>
+</div>
+
+{% if live_enabled %}
+<section class="live-grid">
+  <article class="card video-card">
+    <div class="video-frame" id="video-frame">
+      <img id="video" class="video" alt="Flux de la caméra de contrôle" src="/live/stream">
+      <div id="video-offline" class="video-offline" hidden>
+        <svg viewBox="0 0 24 24" class="icon-large" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1.5l5-2.5v12l-5-2.5V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M4 4l16 16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <strong>Service caméra arrêté</strong>
+        <span class="muted">Lancez <code>facerec run --live-dir …</code> pour reprendre la vidéo.</span>
+      </div>
+    </div>
+  </article>
+
+  <aside class="live-side">
+    <article class="card">
+      <h2>État du service</h2>
+      <div class="status-row"><span id="status-dot" class="dot"></span><strong id="status-text">Connexion…</strong></div>
+      <dl class="facts">
+        <div><dt>Zone</dt><dd id="fact-zone">—</dd></div>
+        <div><dt>Mode</dt><dd id="fact-mode">—</dd></div>
+        <div><dt>Cadence</dt><dd id="fact-fps">—</dd></div>
+      </dl>
+    </article>
+
+    <article class="card door-card" id="door-card">
+      <h2>Porte</h2>
+      <div class="door-row">
+        <svg class="door-icon" viewBox="0 0 48 48" aria-hidden="true">
+          <circle class="door-ring-track" cx="24" cy="24" r="20"/>
+          <circle id="door-ring" class="door-ring" cx="24" cy="24" r="20" transform="rotate(-90 24 24)"/>
+          <path id="door-shackle" class="door-shackle" d="M18 22v-4a6 6 0 0 1 12 0v4"/>
+          <rect class="door-body" x="15" y="22" width="18" height="13" rx="3"/>
+        </svg>
+        <div>
+          <strong id="door-text">—</strong>
+          <div class="muted small" id="door-sub"></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="faces-card">
+      <h2>Visages détectés</h2>
+      <ul class="faces" id="faces"><li class="muted">Aucun visage</li></ul>
+    </article>
+
+    <article class="card" id="enroll-card" hidden>
+      <h2>Inscription en cours</h2>
+      <p><strong id="enroll-name"></strong></p>
+      <progress id="enroll-bar" max="1" value="0"></progress>
+      <p class="muted small" id="enroll-hint"></p>
+    </article>
+  </aside>
+</section>
+<script src="/static/live.js" defer></script>
+{% else %}
+<section class="card empty-state">
+  <svg viewBox="0 0 24 24" class="icon-large" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1.5l5-2.5v12l-5-2.5V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+  <h2>La vidéo en direct n'est pas activée</h2>
+  <p class="muted">Par défaut, aucune image n'est partagée avec l'interface web : une image de visage est une donnée personnelle. Pour l'activer, indiquez le même dossier aux deux programmes :</p>
+  <pre class="code">facerec web --live-dir data/live
+facerec run --challenge --db data/facegate.db --live-dir data/live</pre>
+</section>
+{% endif %}
+{% endblock %}

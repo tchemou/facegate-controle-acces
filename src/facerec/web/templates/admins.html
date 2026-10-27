@@ -1,0 +1,83 @@
+{% extends "layout.html" %}
+{% block title %}Administrateurs{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Administrateurs</h1>
+  <p class="muted">Qui peut se connecter à FaceGate, et avec quels droits. Il doit toujours rester au moins un propriétaire actif.</p>
+</div>
+
+<section class="card">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Identifiant</th><th>Rôle</th><th>Statut</th><th>2FA</th><th>Créé le</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for a in admins %}
+        <tr>
+          <td><strong>{{ a.username }}</strong>{% if a.is_me %} <span class="chip chip-off">vous</span>{% endif %}
+            {% if a.must_change_password %}<div class="muted small">mot de passe à changer</div>{% endif %}</td>
+          <td>{{ a.role_label }}</td>
+          <td><span class="chip {{ 'chip-ok' if a.active else 'chip-off' }}">{{ 'Actif' if a.active else 'Désactivé' }}</span></td>
+          <td>{% if a.totp_enabled %}<span class="chip chip-ok">Oui</span>{% else %}<span class="muted">Non</span>{% endif %}</td>
+          <td class="muted">{{ a.created_at | dt }}</td>
+          <td class="wrap">
+            {% if a.is_me %}<span class="muted small">Gérez votre compte dans « Mon compte »</span>{% else %}
+            <div class="actions">
+              <form method="post" action="/admins/{{ a.id }}/role" class="inline-confirm">
+                <input type="hidden" name="csrf" value="{{ csrf }}">
+                <label class="sr-only" for="role-{{ a.id }}">Rôle de {{ a.username }}</label>
+                <select id="role-{{ a.id }}" name="role">
+                  {% for key, label, help in roles %}<option value="{{ key }}" {{ 'selected' if key == a.role }}>{{ label }}</option>{% endfor %}
+                </select>
+                <button class="btn btn-small btn-ghost" type="submit">Changer le rôle</button>
+              </form>
+              <form method="post" action="/admins/{{ a.id }}/active">
+                <input type="hidden" name="csrf" value="{{ csrf }}">
+                <button class="btn btn-small {{ 'btn-danger' if a.active else 'btn-ghost' }}" type="submit">{{ 'Désactiver' if a.active else 'Réactiver' }}</button>
+              </form>
+              <form method="post" action="/admins/{{ a.id }}/password" class="inline-confirm">
+                <input type="hidden" name="csrf" value="{{ csrf }}">
+                <label class="sr-only" for="pw-{{ a.id }}">Nouveau mot de passe temporaire pour {{ a.username }}</label>
+                <input id="pw-{{ a.id }}" type="password" name="password" placeholder="Nouveau mot de passe temporaire" autocomplete="new-password">
+                <button class="btn btn-small btn-ghost" type="submit">Réinitialiser</button>
+              </form>
+              {% if a.totp_enabled %}
+              <form method="post" action="/admins/{{ a.id }}/reset-2fa">
+                <input type="hidden" name="csrf" value="{{ csrf }}">
+                <button class="btn btn-small btn-ghost" type="submit">Réinitialiser la 2FA</button>
+              </form>
+              {% endif %}
+            </div>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="grid-2 even">
+  <article class="card">
+    <h2>Nouvel administrateur</h2>
+    <form method="post" action="/admins" class="stack">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <label for="new-username">Identifiant</label>
+      <input id="new-username" type="text" name="username" required maxlength="32" autocomplete="off" placeholder="ex. camille.martin">
+      <label for="new-role">Rôle</label>
+      <select id="new-role" name="role" required>
+        {% for key, label, help in roles %}<option value="{{ key }}" {{ 'selected' if key == 'viewer' }}>{{ label }}</option>{% endfor %}
+      </select>
+      <label for="new-password">Mot de passe temporaire</label>
+      <input id="new-password" type="password" name="password" required minlength="12" autocomplete="new-password">
+      <p class="muted small">La personne devra le remplacer dès sa première connexion. Communiquez-le par un canal sûr.</p>
+      <button class="btn btn-primary" type="submit">Créer le compte</button>
+    </form>
+  </article>
+  <article class="card">
+    <h2>Que peut faire chaque rôle ?</h2>
+    <dl class="roles-help">
+      {% for key, label, help in roles %}<div><dt>{{ label }}</dt><dd>{{ help }}</dd></div>{% endfor %}
+    </dl>
+  </article>
+</section>
+{% endblock %}

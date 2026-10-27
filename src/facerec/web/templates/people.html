@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block title %}Personnes{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Personnes</h1>
+  <a class="btn btn-primary-inline" href="/people/new">+ Inscrire une personne</a>
+  <p class="muted">Seules des empreintes numériques sont conservées, jamais de photo. Une personne désactivée perd son accès immédiatement ; une suppression efface ses empreintes et ses droits.</p>
+</div>
+
+<section class="card">
+  {% if people %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Nom</th><th>Statut</th><th>Empreintes</th><th>Consentement</th><th class="hide-narrow">Inscrite le</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for p in people %}
+        <tr>
+          <td><div class="person-cell"><span class="avatar avatar-sm {{ p.name | hue }}" aria-hidden="true">{{ p.name[:1] }}</span><strong>{{ p.name }}</strong></div></td>
+          <td><span class="chip {{ 'chip-ok' if p.active else 'chip-off' }}">{{ 'Active' if p.active else 'Désactivée' }}</span></td>
+          <td>{{ p.samples }}</td>
+          <td class="muted">{{ (p.consent_at | dt) if p.consent_at else "Non enregistré" }}</td>
+          <td class="muted hide-narrow">{{ p.created_at | dt }}</td>
+          <td class="wrap">
+            <div class="actions">
+              <form method="post" action="/people/{{ p.id }}/toggle">
+                <input type="hidden" name="csrf" value="{{ csrf }}">
+                <button class="btn btn-small btn-ghost" type="submit">{{ 'Désactiver' if p.active else 'Activer' }}</button>
+              </form>
+              <form method="post" action="/people/{{ p.id }}/delete" class="inline-confirm">
+                <input type="hidden" name="csrf" value="{{ csrf }}">
+                <input type="text" name="confirm" placeholder="Nom pour confirmer" aria-label="Taper le nom de {{ p.name }} pour confirmer la suppression" autocomplete="off">
+                <button class="btn btn-small btn-danger" type="submit">Supprimer</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="muted">Aucune personne inscrite. Inscrivez-en une avec <code>facerec enroll NOM --db data/facegate.db</code> ou importez une galerie existante avec <code>facerec import-gallery</code>.</p>
+  {% endif %}
+</section>
+{% endblock %}

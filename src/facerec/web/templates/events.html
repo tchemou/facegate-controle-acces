@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+{% block title %}Journal{% endblock %}
+{% block content %}
+<div class="page-head page-head-row">
+  <div>
+    <h1>Journal des accès</h1>
+    <p class="muted">{{ total }} événement{{ 's' if total != 1 }}{{ ' correspondant aux filtres' if q.get('decision') or q.get('person') or q.get('zone') or q.get('from') or q.get('to') }}</p>
+  </div>
+  <a class="btn btn-ghost" href="{{ export_url }}">Exporter en CSV</a>
+</div>
+
+<section class="card">
+  <form method="get" action="/events" class="filters">
+    <div>
+      <label for="f-decision">Décision</label>
+      <select id="f-decision" name="decision">
+        <option value="">Toutes</option>
+        <option value="granted" {{ 'selected' if q.get('decision') == 'granted' }}>Autorisé</option>
+        <option value="denied" {{ 'selected' if q.get('decision') == 'denied' }}>Refusé</option>
+      </select>
+    </div>
+    <div>
+      <label for="f-person">Personne</label>
+      <input id="f-person" type="text" name="person" value="{{ q.get('person', '') }}" placeholder="Nom exact">
+    </div>
+    <div>
+      <label for="f-zone">Zone</label>
+      <select id="f-zone" name="zone">
+        <option value="">Toutes</option>
+        {% for z in zones %}<option value="{{ z }}" {{ 'selected' if q.get('zone') == z }}>{{ z }}</option>{% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="f-from">Du</label>
+      <input id="f-from" type="date" name="from" value="{{ q.get('from', '') }}">
+    </div>
+    <div>
+      <label for="f-to">Au (inclus)</label>
+      <input id="f-to" type="date" name="to" value="{{ q.get('to', '') }}">
+    </div>
+    <div class="filters-actions">
+      <button class="btn btn-small btn-primary-inline" type="submit">Filtrer</button>
+      <a class="btn btn-small btn-ghost" href="/events">Réinitialiser</a>
+    </div>
+  </form>
+</section>
+
+<section class="card">
+  {% if events %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Date</th><th>Personne</th><th>Zone</th><th>Décision</th><th>Détail</th></tr></thead>
+      <tbody>
+        {% for e in events %}
+        <tr>
+          <td>{{ e.at | dt }}</td>
+          <td>{{ e.person or "Inconnu" }}</td>
+          <td>{{ e.zone or "—" }}</td>
+          <td><span class="chip {{ 'chip-ok' if e.decision == 'granted' else 'chip-bad' }}">{{ e.decision | decision }}</span></td>
+          <td class="muted">{{ e.reason | reason if e.reason else "—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <nav class="pager" aria-label="Pagination">
+    {% if prev_url %}<a class="btn btn-small btn-ghost" href="{{ prev_url }}">← Précédent</a>{% else %}<span></span>{% endif %}
+    <span class="muted">Page {{ page }} sur {{ pages }}</span>
+    {% if next_url %}<a class="btn btn-small btn-ghost" href="{{ next_url }}">Suivant →</a>{% else %}<span></span>{% endif %}
+  </nav>
+  {% else %}
+    <p class="muted">Aucun événement ne correspond.</p>
+  {% endif %}
+</section>
+{% endblock %}

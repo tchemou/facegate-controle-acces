@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% from "macros.html" import ico %}
+{% block body %}
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="/">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><use href="/static/favicon.svg#mark"/></svg>
+      <span class="brand-text"><strong>FaceGate</strong><small>Contrôle d'accès</small></span>
+    </a>
+
+    <nav class="nav" aria-label="Navigation principale">
+      <p class="nav-title">Supervision</p>
+      <a href="/" class="nav-link {{ 'is-active' if active == 'dashboard' }}" title="Tableau de bord">{{ ico('grid') }}<span>Tableau de bord</span></a>
+      {% if rank >= 2 %}<a href="/live" class="nav-link {{ 'is-active' if active == 'live' }}" title="En direct">{{ ico('video') }}<span>En direct</span></a>{% endif %}
+      <a href="/events" class="nav-link {{ 'is-active' if active == 'events' }}" title="Journal">{{ ico('list') }}<span>Journal</span></a>
+      {% if rank >= 2 %}
+      <p class="nav-title">Gestion</p>
+      <a href="/people" class="nav-link {{ 'is-active' if active == 'people' }}" title="Personnes">{{ ico('users') }}<span>Personnes</span></a>
+      <a href="/zones" class="nav-link {{ 'is-active' if active == 'zones' }}" title="Zones et horaires">{{ ico('door') }}<span>Zones et horaires</span></a>
+      {% endif %}
+      {% if rank >= 3 %}
+      <p class="nav-title">Administration</p>
+      <a href="/admins" class="nav-link {{ 'is-active' if active == 'admins' }}" title="Administrateurs">{{ ico('key') }}<span>Administrateurs</span></a>
+      <a href="/audit" class="nav-link {{ 'is-active' if active == 'audit' }}" title="Administration">{{ ico('activity') }}<span>Administration</span></a>
+      <a href="/compliance" class="nav-link {{ 'is-active' if active == 'compliance' }}" title="Conformité">{{ ico('file-check') }}<span>Conformité</span></a>
+      {% endif %}
+    </nav>
+
+    <div class="sidebar-foot">
+      <a class="user-card {{ 'is-active' if active == 'account' }}" href="/account" title="Mon compte">
+        <span class="avatar {{ user | hue }}" aria-hidden="true">{{ user[:1] }}</span>
+        <span class="user-meta"><strong>{{ user }}</strong><small>{{ role_label }}</small></span>
+      </a>
+      <div class="sidebar-actions">
+        <form method="post" action="/logout" id="logout-form">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          <button class="btn btn-ghost btn-small" type="submit" title="Déconnexion">{{ ico('logout') }}<span class="logout-label">Déconnexion</span></button>
+        </form>
+        <button class="icon-btn collapse-btn" type="button" id="collapse-btn" title="Réduire le menu" aria-label="Réduire le menu">{{ ico('chevrons-left') }}</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="icon-btn menu-btn" type="button" id="menu-btn" aria-label="Ouvrir le menu">{{ ico('menu') }}</button>
+      <div class="topbar-title"><small>FaceGate</small><strong>{{ self.title() }}</strong></div>
+      <span class="topbar-spacer"></span>
+      {% if rank >= 2 %}
+      <div class="pills" id="status-pills" data-endpoint="/api/live" hidden>
+        <span class="pill" id="pill-service"><span class="dot"></span><span>Service</span></span>
+        <span class="pill" id="pill-door">{{ ico('lock') }}<span>Porte</span></span>
+      </div>
+      {% endif %}
+      <button class="search-trigger" type="button" id="palette-open" aria-label="Rechercher ou aller à">{{ ico('search') }}<span>Rechercher ou aller à…</span><kbd>Ctrl K</kbd></button>
+      <button class="icon-btn" type="button" id="theme-toggle" aria-label="Changer de thème" title="Changer de thème"><span class="theme-icon-dark">{{ ico('moon') }}</span><span class="theme-icon-light">{{ ico('sun') }}</span></button>
+    </header>
+    <main class="page">
+      {% if flash %}<div class="flash flash-{{ flash[0] }}" role="status">{{ ico('check' if flash[0] == 'ok' else 'alert') }}<span>{{ flash[1] }}</span></div>{% endif %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+<dialog class="palette" id="palette" aria-label="Palette de commandes">
+  <div class="palette-box">
+    <div class="palette-input">{{ ico('search') }}<input id="palette-input" type="text" placeholder="Aller à, ou faire…" autocomplete="off" spellcheck="false" aria-label="Rechercher"></div>
+    <ul class="palette-list" id="palette-list">
+      <li class="palette-group">Aller à</li>
+      <li class="palette-item" data-keywords="tableau de bord accueil vue ensemble"><a href="/">{{ ico('grid') }}<span>Tableau de bord</span></a></li>
+      {% if rank >= 2 %}<li class="palette-item" data-keywords="direct video camera live"><a href="/live">{{ ico('video') }}<span>En direct</span></a></li>{% endif %}
+      <li class="palette-item" data-keywords="journal acces evenements historique"><a href="/events">{{ ico('list') }}<span>Journal des accès</span></a></li>
+      {% if rank >= 2 %}
+      <li class="palette-item" data-keywords="personnes utilisateurs visages"><a href="/people">{{ ico('users') }}<span>Personnes</span></a></li>
+      <li class="palette-item" data-keywords="zones horaires portes regles droits"><a href="/zones">{{ ico('door') }}<span>Zones et horaires</span></a></li>
+      {% endif %}
+      {% if rank >= 3 %}
+      <li class="palette-item" data-keywords="administrateurs comptes roles"><a href="/admins">{{ ico('key') }}<span>Administrateurs</span></a></li>
+      <li class="palette-item" data-keywords="audit administration journal modifications"><a href="/audit">{{ ico('activity') }}<span>Journal d'administration</span></a></li>
+      <li class="palette-item" data-keywords="conformite rgpd conservation export"><a href="/compliance">{{ ico('file-check') }}<span>Conformité</span></a></li>
+      {% endif %}
+      <li class="palette-item" data-keywords="compte profil mot de passe double authentification 2fa"><a href="/account">{{ ico('user') }}<span>Mon compte</span></a></li>
+      <li class="palette-group">Actions</li>
+      {% if rank >= 2 %}
+      <li class="palette-item" data-keywords="inscrire ajouter nouvelle personne enrolement"><a href="/people/new">{{ ico('plus') }}<span>Inscrire une personne</span><small>Action</small></a></li>
+      <li class="palette-item" data-keywords="exporter csv journal telecharger"><a href="/events.csv">{{ ico('download') }}<span>Exporter le journal (CSV)</span><small>Action</small></a></li>
+      {% endif %}
+      <li class="palette-item" data-keywords="theme clair sombre mode"><button type="button" data-action="theme">{{ ico('moon') }}<span>Changer de thème</span><small>Action</small></button></li>
+      <li class="palette-item" data-keywords="deconnexion quitter sortir logout"><button type="button" data-action="logout">{{ ico('logout') }}<span>Se déconnecter</span><small>Action</small></button></li>
+    </ul>
+    <p class="palette-empty" id="palette-empty" hidden>Aucun résultat</p>
+    <div class="palette-foot"><span><kbd>↑</kbd> <kbd>↓</kbd> naviguer</span><span><kbd>↵</kbd> ouvrir</span><span><kbd>Échap</kbd> fermer</span></div>
+  </div>
+</dialog>
+{% endblock %}

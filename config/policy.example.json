@@ -1,0 +1,12 @@
+{
+  "zones": {
+    "lab": {
+      "pagnol": "always"
+    },
+    "salle-serveurs": {
+      "pagnol": [
+        {"days": ["mon", "tue", "wed", "thu", "fri"], "from": "08:00", "to": "19:00"}
+      ]
+    }
+  }
+}

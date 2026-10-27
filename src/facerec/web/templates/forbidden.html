@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block title %}Accès refusé{% endblock %}
+{% block content %}
+<section class="card empty-state">
+  <svg viewBox="0 0 24 24" class="icon-large" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+  <h1>Accès refusé</h1>
+  <p class="muted">Votre rôle ({{ role_label }}) ne permet pas d'ouvrir cette page. Demandez à un propriétaire de modifier vos droits si vous en avez besoin.</p>
+  <a class="btn btn-primary-inline" href="/">Retour au tableau de bord</a>
+</section>
+{% endblock %}

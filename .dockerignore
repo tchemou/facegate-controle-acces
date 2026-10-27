@@ -1,0 +1,21 @@
+# Never ship personal data, keys or caches into an image
+data/
+gallery/
+logs/
+models/
+*.npz
+*.key
+*.db
+*.db-wal
+*.db-shm
+.env
+.venv/
+.git/
+.github/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+tests/
+results/
+docs/

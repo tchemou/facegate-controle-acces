@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Vérification{% endblock %}
+{% block body %}
+<main class="auth-side auth-solo">
+  <section class="auth-card">
+    <div class="brand brand-lg">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><use href="/static/favicon.svg#mark"/></svg>
+      <span class="brand-text"><strong>FaceGate</strong></span>
+    </div>
+    <h1>Vérification en deux étapes</h1>
+    <p class="muted">Entrez le code à 6 chiffres affiché par votre application d'authentification, ou l'un de vos codes de secours.</p>
+    {% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+    <form method="post" action="/login/2fa" autocomplete="off">
+      <label for="code">Code</label>
+      <input id="code" name="code" type="text" inputmode="text" autocomplete="one-time-code" required autofocus
+             class="code-input" maxlength="16" spellcheck="false">
+      <button class="btn btn-primary" type="submit">Valider</button>
+    </form>
+    <p class="muted small center"><a href="/login">← Revenir à la connexion</a></p>
+  </section>
+</main>
+{% endblock %}

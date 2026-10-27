@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}Administration{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Journal d'administration</h1>
+  <p class="muted">Trace de ce que les administrateurs ont modifié : utile pour démontrer la maîtrise des données biométriques (RGPD).</p>
+</div>
+
+<section class="card">
+  {% if entries %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Date</th><th>Administrateur</th><th>Action</th><th>Détail</th></tr></thead>
+      <tbody>
+        {% for e in entries %}
+        <tr>
+          <td>{{ e.at | dt }}</td>
+          <td>{{ e.admin }}</td>
+          <td>{{ action_labels.get(e.action, e.action) }}</td>
+          <td class="muted">{{ e.detail or "—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="muted">Aucune modification enregistrée pour l'instant.</p>
+  {% endif %}
+</section>
+{% endblock %}

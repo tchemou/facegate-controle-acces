@@ -1,0 +1,94 @@
+{
+  "settings": {
+    "detector": "hog",
+    "embedder": "sface",
+    "detector_upsample": 0,
+    "detect_scale": 1.0,
+    "embedding_jitters": 1,
+    "min_face_px": 80,
+    "min_blur": 40.0,
+    "min_brightness": 50.0,
+    "max_brightness": 215.0,
+    "max_yaw": 0.6,
+    "match_threshold": 0.5,
+    "min_margin": 0.04,
+    "vote_window": 7,
+    "vote_ratio": 0.6,
+    "min_votes": 4,
+    "process_every": 2,
+    "blink_ear": 0.21,
+    "blink_min_frames": 2,
+    "blink_validity_s": 5.0,
+    "track_max_dist": 90.0,
+    "track_max_missed": 10
+  },
+  "n_enroll": 3,
+  "seeds": 5,
+  "dataset": {
+    "images": 1315,
+    "face_detected": 1311,
+    "quality_ok": 1085,
+    "rejection_reasons": {
+      "blurry": 162,
+      "not_frontal": 69,
+      "no_face": 4,
+      "too_small": 2,
+      "cut_off": 6
+    },
+    "blur_quantiles_10_50_90": [
+      37.36213451482415,
+      78.01724876775587,
+      163.24825862326855
+    ]
+  },
+  "without_quality_gate": {
+    "eer": [
+      0.01368253281724231,
+      0.0052827862564047414
+    ],
+    "eer_threshold": [
+      1.11,
+      0.010954451150103331
+    ],
+    "at_fpir_1pct": {
+      "threshold": 1.102,
+      "fnir": 0.014904418261615215,
+      "fpir": 0.006875572260432211
+    },
+    "at_default_threshold": {
+      "threshold": 0.5,
+      "fnir": 0.999618320610687,
+      "fpir": 0.0
+    },
+    "not_acquired_genuine": 1.6,
+    "genuine_probes": 523.6,
+    "impostor_probes": 671.4,
+    "identities_known": 40,
+    "identities_unknown": 40
+  },
+  "with_quality_gate": {
+    "eer": [
+      0.007318379531753798,
+      0.0033359229001645985
+    ],
+    "eer_threshold": [
+      1.088,
+      0.014696938456699083
+    ],
+    "at_fpir_1pct": {
+      "threshold": 1.096,
+      "fnir": 0.007307999165327495,
+      "fpir": 0.006868265646329437
+    },
+    "at_default_threshold": {
+      "threshold": 0.5,
+      "fnir": 0.9995226730310263,
+      "fpir": 0.0
+    },
+    "not_acquired_genuine": 105.8,
+    "genuine_probes": 518.8,
+    "impostor_probes": 671.4,
+    "identities_known": 40,
+    "identities_unknown": 40
+  }
+}

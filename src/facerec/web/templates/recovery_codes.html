@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>{{ title }}</h1>
+  <p class="muted">Voici vos <strong>codes de secours</strong>. Chacun ne sert <strong>qu'une fois</strong> et remplace l'application si vous perdez votre téléphone. <strong>Ils ne seront plus jamais affichés</strong> : notez-les ou imprimez cette page, et gardez-les en lieu sûr.</p>
+</div>
+
+<section class="card narrow">
+  <ul class="codes" aria-label="Codes de secours">
+    {% for c in codes %}<li><code>{{ c }}</code></li>{% endfor %}
+  </ul>
+  <div class="form-actions">
+    <a class="btn btn-primary-inline btn-wide" href="/account">J'ai noté mes codes</a>
+  </div>
+</section>
+{% endblock %}

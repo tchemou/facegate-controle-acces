@@ -1,0 +1,37 @@
+# NOTE: not run on the development machine (no Docker there): see docs/DEPLOIEMENT.md for what to check first.
+#
+#   docker compose up -d web                      # the administration web app
+#   docker compose --profile camera up -d         # + the recognition service (Linux, with a camera)
+#
+# Create the first administrator (the password is typed in the terminal, never on the command line):
+#   docker compose run --rm -it web python -m facerec.web create-admin NAME
+#
+# The web app listens on 127.0.0.1 only. For other machines put a TLS proxy in front (see docs/DEPLOIEMENT.md).
+
+services:
+  web:
+    build: {context: ., target: web}
+    ports: ["127.0.0.1:8000:8000"]
+    environment:
+      FACEGATE_SECURE_COOKIES: "${FACEGATE_SECURE_COOKIES:-0}"  # 1 once a TLS proxy is in front
+    volumes: ["facegate-data:/data"]
+    restart: unless-stopped
+    read_only: true
+    tmpfs: ["/tmp"]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+
+  camera:
+    profiles: ["camera"]
+    build: {context: ., target: service}
+    devices: ["/dev/video0:/dev/video0"]  # Linux only; Docker Desktop (Windows/macOS) cannot pass a webcam
+    environment:
+      FACEGATE_KEY: "${FACEGATE_KEY:?set FACEGATE_KEY (see docs/DEPLOIEMENT.md): a key kept outside the database}"
+    volumes: ["facegate-data:/data"]
+    restart: unless-stopped
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    depends_on: [web]
+
+volumes:
+  facegate-data:

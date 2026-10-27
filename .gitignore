@@ -1,0 +1,21 @@
+.venv/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+
+# Personal data: never commit faces, embeddings or decision logs
+data/
+gallery/
+logs/
+*.npz
+
+# Keep human-readable results, drop bulky caches
+results_val_log.txt
+results_val_err.txt
+
+# Not for publication: preview shows a third party's photo from the LFW dataset; attaques.md is an early, invalid trial run
+results/overlay_preview.png
+results/attaques.md
+
+# Downloaded models (scripts/download_models.py)
+models/

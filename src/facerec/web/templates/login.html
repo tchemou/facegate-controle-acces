@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% from "macros.html" import ico %}
+{% block title %}Connexion{% endblock %}
+{% block body %}
+<div class="auth-shell">
+  <section class="auth-hero" aria-hidden="false">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><use href="/static/favicon.svg#mark"/></svg>
+      <span class="brand-text"><strong>FaceGate</strong><small>Contrôle d'accès</small></span>
+    </div>
+
+    <div class="scan-stage" aria-hidden="true">
+      <svg viewBox="0 0 400 400">
+        <defs>
+          <linearGradient id="scanGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#818cf8"/><stop offset="1" stop-color="#22d3ee"/></linearGradient>
+          <linearGradient id="sweepGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22d3ee" stop-opacity="0"/><stop offset=".5" stop-color="#22d3ee" stop-opacity=".9"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0"/></linearGradient>
+          <clipPath id="faceClip"><ellipse cx="200" cy="200" rx="92" ry="118"/></clipPath>
+        </defs>
+        <circle class="scan-ring" cx="200" cy="200" r="178" fill="none" stroke="url(#scanGrad)" stroke-width="1.5" stroke-dasharray="3 9" opacity=".7"/>
+        <circle class="scan-ring reverse" cx="200" cy="200" r="154" fill="none" stroke="url(#scanGrad)" stroke-width="1" stroke-dasharray="40 14" opacity=".45"/>
+        <ellipse cx="200" cy="200" rx="92" ry="118" fill="rgba(129,140,248,.07)" stroke="url(#scanGrad)" stroke-width="2"/>
+        <g class="scan-dots" fill="#67e8f9">
+          <circle cx="168" cy="170" r="3"/><circle cx="232" cy="170" r="3"/><circle cx="200" cy="198" r="3"/>
+          <circle cx="172" cy="236" r="3"/><circle cx="228" cy="236" r="3"/><circle cx="200" cy="258" r="3"/>
+          <circle cx="150" cy="200" r="2.5"/><circle cx="250" cy="200" r="2.5"/><circle cx="200" cy="140" r="2.5"/>
+        </g>
+        <g stroke="#67e8f9" stroke-width=".8" opacity=".4" fill="none">
+          <path d="M168 170 L232 170 L200 198 Z M172 236 L228 236 L200 258 Z M168 170 L150 200 L172 236 M232 170 L250 200 L228 236 M200 140 L168 170 M200 140 L232 170"/>
+        </g>
+        <g clip-path="url(#faceClip)"><rect class="scan-line" x="100" y="150" width="200" height="60" fill="url(#sweepGrad)"/></g>
+        <g class="scan-brackets" fill="none" stroke="#67e8f9" stroke-width="3" stroke-linecap="round">
+          <path d="M96 118 V92 H122"/><path d="M304 118 V92 H278"/><path d="M96 282 V308 H122"/><path d="M304 282 V308 H278"/>
+        </g>
+      </svg>
+      <span class="scan-chip chip-a">Identité vérifiée</span>
+      <span class="scan-chip chip-b">Photo détectée · refusée</span>
+    </div>
+
+    <div class="hero-copy">
+      <h2>Chaque accès, <span class="grad">vérifié et tracé.</span></h2>
+      <p>Reconnaissance faciale avec détection de fraude, données chiffrées et journal conforme au RGPD.</p>
+      <div class="hero-points">
+        <span>{{ ico('shield') }}Anti-usurpation</span>
+        <span>{{ ico('lock') }}Chiffrement AES-256</span>
+        <span>{{ ico('file-check') }}RGPD</span>
+      </div>
+    </div>
+  </section>
+
+  <main class="auth-side">
+    <section class="auth-card">
+      <div class="brand brand-lg">
+        <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><use href="/static/favicon.svg#mark"/></svg>
+        <span class="brand-text"><strong>FaceGate</strong></span>
+      </div>
+      <h1>Connexion</h1>
+      <p class="muted">Espace d'administration du contrôle d'accès.</p>
+
+      {% if no_admin %}
+        <div class="notice">Aucun administrateur n'existe encore. Créez-en un en ligne de commande :
+          <code>facerec admin create NOM</code></div>
+      {% endif %}
+      {% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+
+      <form method="post" action="/login" autocomplete="on">
+        <label for="username">Identifiant</label>
+        <input id="username" name="username" type="text" autocomplete="username" required autofocus>
+        <label for="password">Mot de passe</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+        <button class="btn btn-primary" type="submit">Se connecter</button>
+      </form>
+    </section>
+    <p class="auth-foot muted">{{ ico('lock') }}<span>Les empreintes faciales sont des données biométriques : accès réservé aux personnes habilitées.</span></p>
+  </main>
+</div>
+{% endblock %}

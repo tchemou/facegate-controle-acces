@@ -1,0 +1,93 @@
+{
+  "settings": {
+    "detector": "yunet",
+    "embedder": "sface",
+    "detector_upsample": 0,
+    "detect_scale": 1.0,
+    "embedding_jitters": 1,
+    "min_face_px": 80,
+    "min_blur": 40.0,
+    "min_brightness": 50.0,
+    "max_brightness": 215.0,
+    "max_yaw": 0.6,
+    "match_threshold": 0.5,
+    "min_margin": 0.04,
+    "vote_window": 7,
+    "vote_ratio": 0.6,
+    "min_votes": 4,
+    "process_every": 2,
+    "blink_ear": 0.21,
+    "blink_min_frames": 2,
+    "blink_validity_s": 5.0,
+    "track_max_dist": 90.0,
+    "track_max_missed": 10
+  },
+  "n_enroll": 3,
+  "seeds": 5,
+  "dataset": {
+    "images": 1315,
+    "face_detected": 1315,
+    "quality_ok": 1178,
+    "rejection_reasons": {
+      "not_frontal": 51,
+      "blurry": 70,
+      "too_small": 21,
+      "cut_off": 1
+    },
+    "blur_quantiles_10_50_90": [
+      46.949905349750516,
+      94.27503920256818,
+      181.48863730027446
+    ]
+  },
+  "without_quality_gate": {
+    "eer": [
+      0.013075511015123923,
+      0.0047521648108946254
+    ],
+    "eer_threshold": [
+      1.112,
+      0.007483314773547889
+    ],
+    "at_fpir_1pct": {
+      "threshold": 1.102,
+      "fnir": 0.015686187832303466,
+      "fpir": 0.0077557594781443836
+    },
+    "at_default_threshold": {
+      "threshold": 0.5,
+      "fnir": 0.999619771863118,
+      "fpir": 0.0
+    },
+    "not_acquired_genuine": 0.0,
+    "genuine_probes": 523.6,
+    "impostor_probes": 671.4,
+    "identities_known": 40,
+    "identities_unknown": 40
+  },
+  "with_quality_gate": {
+    "eer": [
+      0.01224402541653145,
+      0.004975118695868037
+    ],
+    "eer_threshold": [
+      1.1060000000000003,
+      0.01019803902718558
+    ],
+    "at_fpir_1pct": {
+      "threshold": 1.1,
+      "fnir": 0.014147050935613503,
+      "fpir": 0.007310733119263528
+    },
+    "at_default_threshold": {
+      "threshold": 0.5,
+      "fnir": 0.9995633187772925,
+      "fpir": 0.0
+    },
+    "not_acquired_genuine": 67.6,
+    "genuine_probes": 523.6,
+    "impostor_probes": 671.4,
+    "identities_known": 40,
+    "identities_unknown": 40
+  }
+}

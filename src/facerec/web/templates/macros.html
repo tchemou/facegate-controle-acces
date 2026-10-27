@@ -1,0 +1,4 @@
+{# Shared building blocks. Icons come from the one sprite in /static/icons.svg. #}
+{% macro ico(name, cls="") %}<svg class="icon {{ cls }}" aria-hidden="true"><use href="/static/icons.svg#{{ name }}"/></svg>{% endmacro %}
+
+{% macro avatar(name, small=False) %}<span class="avatar {{ name | hue }}{{ ' avatar-sm' if small }}" aria-hidden="true">{{ name[:1] }}</span>{% endmacro %}

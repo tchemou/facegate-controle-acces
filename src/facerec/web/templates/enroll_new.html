@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}Inscrire une personne{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Inscrire une personne</h1>
+  <p class="muted">La personne se place devant la caméra de contrôle. Le système prend {{ samples }} empreintes en la laissant bouger légèrement la tête. Aucune photo n'est conservée.</p>
+</div>
+
+<section class="card narrow">
+  <form method="post" action="/people/enroll" class="stack">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <label for="enroll-name">Nom de la personne</label>
+    <input id="enroll-name" type="text" name="name" maxlength="40" required autofocus autocomplete="off" placeholder="Ex. Camille Martin">
+
+    <fieldset class="consent">
+      <legend>Consentement</legend>
+      <blockquote>{{ consent_text }}</blockquote>
+      <label class="check"><input type="checkbox" name="consent" value="yes" required> La personne a lu ce texte et y consent, devant moi.</label>
+    </fieldset>
+
+    <div class="form-actions">
+      <a class="btn btn-ghost" href="/people">Annuler</a>
+      <button class="btn btn-primary-inline btn-wide" type="submit">Démarrer l'inscription</button>
+    </div>
+    {% if not live_enabled %}
+    <p class="muted small">La vidéo en direct n'est pas activée : l'inscription fonctionnera, mais vous ne verrez pas l'image ici (voir « En direct »).</p>
+    {% endif %}
+  </form>
+</section>
+{% endblock %}

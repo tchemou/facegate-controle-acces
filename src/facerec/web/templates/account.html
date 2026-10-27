@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+{% block title %}Mon compte{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Mon compte</h1>
+  <p class="muted">Connecté en tant que <strong>{{ user }}</strong> · rôle <strong>{{ role_label }}</strong></p>
+</div>
+
+{% if must_change %}
+<div class="flash flash-error" role="alert">Votre mot de passe a été défini par un propriétaire : choisissez-en un nouveau pour continuer.</div>
+{% endif %}
+
+<section class="grid-2 even">
+  <article class="card">
+    <h2>Mot de passe</h2>
+    <form method="post" action="/account/password" class="stack">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <label for="current">Mot de passe actuel</label>
+      <input id="current" type="password" name="current_password" autocomplete="current-password" required>
+      <label for="new">Nouveau mot de passe</label>
+      <input id="new" type="password" name="new_password" autocomplete="new-password" required minlength="12">
+      <label for="confirm">Confirmer le nouveau mot de passe</label>
+      <input id="confirm" type="password" name="confirm_password" autocomplete="new-password" required minlength="12">
+      <p class="muted small">12 caractères minimum, avec majuscules, minuscules et au moins un chiffre. Vos autres sessions seront fermées.</p>
+      <button class="btn btn-primary" type="submit">Changer le mot de passe</button>
+    </form>
+  </article>
+
+  <article class="card">
+    <h2>Double authentification</h2>
+    {% if totp_enabled %}
+      <p><span class="chip chip-ok">Activée</span> <span class="muted">· {{ recovery_left }} code{{ 's' if recovery_left != 1 }} de secours restant{{ 's' if recovery_left != 1 }}</span></p>
+      <p class="muted small">À chaque connexion, un code de votre application d'authentification est demandé en plus du mot de passe.</p>
+      <form method="post" action="/account/2fa/recovery" class="stack">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <label for="pw-recovery">Mot de passe actuel</label>
+        <input id="pw-recovery" type="password" name="password" autocomplete="current-password" required>
+        <button class="btn btn-ghost" type="submit">Générer de nouveaux codes de secours</button>
+      </form>
+      <form method="post" action="/account/2fa/disable" class="stack">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <label for="pw-disable">Mot de passe actuel</label>
+        <input id="pw-disable" type="password" name="password" autocomplete="current-password" required>
+        <button class="btn btn-danger" type="submit">Désactiver la double authentification</button>
+      </form>
+    {% else %}
+      <p><span class="chip chip-off">Désactivée</span></p>
+      <p class="muted small">Ajoute une protection forte : même si votre mot de passe est volé, il faut aussi votre téléphone. Recommandé pour tout propriétaire ou gestionnaire.</p>
+      <form method="post" action="/account/2fa/start" class="stack">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <label for="pw-start">Mot de passe actuel</label>
+        <input id="pw-start" type="password" name="password" autocomplete="current-password" required>
+        <button class="btn btn-primary-inline btn-wide" type="submit">Activer la double authentification</button>
+      </form>
+    {% endif %}
+  </article>
+</section>
+{% endblock %}

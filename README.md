@@ -197,5 +197,3 @@ scripts/       download_models.py, fetch_lfw.py, ablation.py, analyze_failures.p
 tests/         443 tests (logique, sécurité de l'interface, boucle caméra simulée, bout en bout sur visages réels si LFW est présent)
 results/       un dossier par configuration (rapports, courbes), vitesse
 ```
-#   f a c e g a t e - c o n t r o l e - a c c e s  
- 

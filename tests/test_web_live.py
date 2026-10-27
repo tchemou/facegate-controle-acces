@@ -121,7 +121,9 @@ def test_mjpeg_chunks_send_only_new_frames_and_stop_when_the_client_leaves(live)
         async for chunk in mjpeg_chunks(reader, disconnected, interval=0.001, max_seconds=5):
             chunks.append(chunk)
             if len(chunks) == 1:  # a new frame appears: it must be sent once
-                pub.publish(np.full((60, 80, 3), 30, np.uint8), {})
+                # explicit clock: right after the fixture's frame, the fps cap would drop it (coarse clock on
+                # Windows before Python 3.13, sub-millisecond gap on fast Linux runners)
+                assert pub.publish(np.full((60, 80, 3), 30, np.uint8), {}, now=time.monotonic() + 1)
         return chunks
 
     chunks = asyncio.run(run())
